@@ -1,51 +1,54 @@
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
+import Dashboard from "./components/Dashboard";
+import Cases from "./components/Cases";
+import Clients from "./components/Clients";
+import CourtDates from "./components/CourtDates";
+import Users from "./components/Users";
+import Sidebar from "./components/Sidebar";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    helloWorldApi();
+    // For demo purposes, set a default user
+    setCurrentUser({
+      id: "default-user",
+      name: "John Smith",
+      email: "john.smith@lawfirm.com",
+      role: "attorney"
+    });
   }, []);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
     <div className="App">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <div className="flex h-screen bg-gray-50">
+          <Sidebar 
+            isOpen={sidebarOpen} 
+            toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            currentUser={currentUser}
+          />
+          
+          <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
+            <main className="flex-1 overflow-y-auto p-6">
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard currentUser={currentUser} />} />
+                <Route path="/cases" element={<Cases currentUser={currentUser} />} />
+                <Route path="/clients" element={<Clients currentUser={currentUser} />} />
+                <Route path="/court-dates" element={<CourtDates currentUser={currentUser} />} />
+                <Route path="/users" element={<Users currentUser={currentUser} />} />
+              </Routes>
+            </main>
+          </div>
+        </div>
       </BrowserRouter>
     </div>
   );
