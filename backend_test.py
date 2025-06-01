@@ -274,7 +274,8 @@ def test_court_dates():
         case_id = cases[0]["id"]
         
         # Create court dates
-        for court_date_data in test_court_dates:
+        for court_date in test_court_dates:
+            court_date_data = court_date.copy()
             court_date_data["case_id"] = case_id
             
             response = requests.post(f"{BACKEND_URL}/court-dates", json=court_date_data)
