@@ -274,12 +274,30 @@ def test_court_dates():
         case_id = cases[0]["id"]
         
         # Create court dates
-        for court_date in test_court_dates:
-            court_date_data = court_date.copy()
-            court_date_data["case_id"] = case_id
-            
-            response = requests.post(f"{BACKEND_URL}/court-dates", json=court_date_data)
-            logger.info(f"Creating court date: {court_date_data['hearing_type']} (Priority: {court_date_data['priority']})")
+        court_date_data = [
+            {
+                "date": (datetime.utcnow() + timedelta(days=7)).isoformat(),
+                "court_name": "Superior Court",
+                "judge_name": "Judge Wilson",
+                "hearing_type": "Status Conference",
+                "notes": "Prepare status report",
+                "priority": "medium",
+                "case_id": case_id
+            },
+            {
+                "date": (datetime.utcnow() + timedelta(days=14)).isoformat(),
+                "court_name": "District Court",
+                "judge_name": "Judge Brown",
+                "hearing_type": "Trial",
+                "notes": "Final trial date",
+                "priority": "high",
+                "case_id": case_id
+            }
+        ]
+        
+        for court_date in court_date_data:
+            response = requests.post(f"{BACKEND_URL}/court-dates", json=court_date)
+            logger.info(f"Creating court date: {court_date['hearing_type']} (Priority: {court_date['priority']})")
             print_response(response)
             
             if response.status_code == 200:
